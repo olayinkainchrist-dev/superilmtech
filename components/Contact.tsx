@@ -22,12 +22,12 @@ export default function Contact() {
           <div className="mt-8 space-y-4">
             <div className="flex items-center gap-3 text-slate-300">
               <Mail className="text-cyan-400" />
-              hello@superilmtech.com
+              superilmtech@gmail.com | hello@superilmtech.com
             </div>
 
             <div className="flex items-center gap-3 text-slate-300">
               <Phone className="text-cyan-400" />
-              +2348052480026
+              +2348052480026 | +2349030320363
             </div>
 
             <div className="flex items-center gap-3 text-slate-300">
