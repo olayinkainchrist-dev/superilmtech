@@ -50,13 +50,6 @@ export default function Products() {
           </div>
         )}
 
-        {/* ⚠️ Error fallback notice */}
-        {error && (
-          <div className="mb-6 text-center text-yellow-400">
-            Showing demo products (backend not connected)
-          </div>
-        )}
-
         <div className="grid gap-8 lg:grid-cols-3">
           {products.map((product, index) => (
             <div
