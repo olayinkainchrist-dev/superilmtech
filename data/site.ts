@@ -14,11 +14,11 @@ import {
 } from "lucide-react"
 
 export const navLinks = [
-  { label: "Solutions", href: "#solutions" },
-  { label: "Products", href: "#products" },
-  { label: "Portfolio", href: "#portfolio" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Contact", href: "#contact" }
+  { label: "Solutions", href: "/solutions" },
+  { label: "Products", href: "/products" },
+  { label: "Portfolio", href: "/portfolio" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Contact", href: "/contact" }
 ]
 
 export const stats = [
