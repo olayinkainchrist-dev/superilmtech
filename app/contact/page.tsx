@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
+import ContactForm from "@/components/ContactForm"
 import { Mail, MapPin, Phone } from "lucide-react"
 
 export const metadata: Metadata = {
@@ -34,12 +35,12 @@ export default function ContactPage() {
             <div className="mt-8 space-y-4">
               <div className="flex items-center gap-3 text-slate-300">
                 <Mail className="text-cyan-400" />
-                hello@superilmtech.com
+                superilmtech@gmail.com | admin@superilmtech.com
               </div>
 
               <div className="flex items-center gap-3 text-slate-300">
                 <Phone className="text-cyan-400" />
-                +234 805 248 0026
+                +234 805 248 0026 | +234 903 032 0363
               </div>
 
               <div className="flex items-center gap-3 text-slate-300">
@@ -49,42 +50,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <form className="glass rounded-3xl p-7">
-            <div className="grid gap-5">
-              <input
-                className="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 outline-none transition focus:border-blue-500"
-                placeholder="Full name"
-              />
-
-              <input
-                className="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 outline-none transition focus:border-blue-500"
-                placeholder="Email address"
-                type="email"
-              />
-
-              <input
-                className="rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 outline-none transition focus:border-blue-500"
-                placeholder="Project type e.g. SaaS, POS, Website, AI Tool"
-              />
-
-              <textarea
-                className="min-h-40 rounded-2xl border border-white/10 bg-slate-950 px-5 py-4 outline-none transition focus:border-blue-500"
-                placeholder="Tell us about your project..."
-              />
-
-              <button
-                type="button"
-                className="rounded-full bg-blue-600 px-7 py-4 font-black text-white shadow-glow transition hover:bg-blue-500"
-              >
-                Send Project Request
-              </button>
-
-              <p className="text-sm text-slate-500">
-                This form can be connected to a backend API, Formspree, Resend,
-                EmailJS, or your custom SuperILM backend.
-              </p>
-            </div>
-          </form>
+          <ContactForm />
         </div>
       </section>
 

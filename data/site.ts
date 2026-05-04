@@ -214,7 +214,7 @@ export const company = {
   name: "SuperILM Tech",
   legalName: "SuperILM Technologies",
   tagline: "Software • SaaS • AI",
-  email: "hello@superilmtech.com",
+  email: "admin@superilmtech.com",
   phone: "+2348052480026",
   location: "Lagos, Nigeria — serving global clients",
   website: "https://superilmtech.com",
