@@ -1,4 +1,5 @@
 import { Resend } from "resend"
+import { supabase } from "@/lib/supabase"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -14,13 +15,37 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;")
+}
+
 export async function POST(request: Request) {
   try {
     if (!process.env.RESEND_API_KEY) {
       return Response.json(
         {
           success: false,
-          error: "RESEND_API_KEY is missing. Add it to .env.local and restart server.",
+          error:
+            "RESEND_API_KEY is missing. Add it to .env.local and restart server.",
+        },
+        { status: 500 }
+      )
+    }
+
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      return Response.json(
+        {
+          success: false,
+          error:
+            "Supabase environment variables are missing. Add them to .env.local and restart server.",
         },
         { status: 500 }
       )
@@ -54,7 +79,25 @@ export async function POST(request: Request) {
 
     const toEmail = process.env.CONTACT_TO_EMAIL || "admin@superilmtech.com"
     const fromEmail =
-      process.env.CONTACT_FROM_EMAIL || "SuperILM Tech <onboarding@resend.dev>"
+      process.env.CONTACT_FROM_EMAIL || "SuperILM Tech <hello@superilmtech.com>"
+
+    const { error: dbError } = await supabase.from("leads").insert([
+      {
+        name,
+        email,
+        service: projectType,
+        message,
+      },
+    ])
+
+    if (dbError) {
+      console.error("Supabase lead insert error:", dbError)
+    }
+
+    const safeName = escapeHtml(name)
+    const safeEmail = escapeHtml(email)
+    const safeProjectType = escapeHtml(projectType)
+    const safeMessage = escapeHtml(message).replace(/\n/g, "<br />")
 
     const result = await resend.emails.send({
       from: fromEmail,
@@ -64,12 +107,12 @@ export async function POST(request: Request) {
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
           <h2>New Project Request</h2>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Project Type:</strong> ${projectType}</p>
+          <p><strong>Name:</strong> ${safeName}</p>
+          <p><strong>Email:</strong> ${safeEmail}</p>
+          <p><strong>Project Type:</strong> ${safeProjectType}</p>
           <hr />
           <p><strong>Message:</strong></p>
-          <p>${message.replace(/\n/g, "<br />")}</p>
+          <p>${safeMessage}</p>
         </div>
       `,
     })
@@ -83,16 +126,15 @@ export async function POST(request: Request) {
 
     return Response.json({
       success: true,
-      message: "Message sent successfully.",
+      message: dbError
+        ? "Message sent successfully, but lead storage failed."
+        : "Message sent and saved successfully.",
     })
   } catch (error) {
     return Response.json(
       {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Something went wrong.",
+        error: error instanceof Error ? error.message : "Something went wrong.",
       },
       { status: 500 }
     )
