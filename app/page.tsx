@@ -12,53 +12,30 @@ import Solutions from "@/components/Solutions"
 export default function HomePage() {
   return (
     <main>
-      {/* SEO H1 (hidden visually but VERY important for Google) */}
       <h1 className="sr-only">
-        SuperILM Tech - Software, SaaS, AI and Enterprise Solutions Company
+        SuperILM Tech - Software Development, SaaS Platforms, AI Solutions, POS
+        Systems and Enterprise Technology Company in Nigeria
       </h1>
 
-      {/* Header Navigation */}
-      <header>
-        <Navbar />
-      </header>
+      <Navbar />
 
-      {/* Main Content */}
-      <section>
-        <Hero />
-      </section>
+      <Hero />
 
-      <section>
-        <Solutions />
-      </section>
+      <Solutions />
 
-      <section>
-        <Products />
-      </section>
+      <Products />
 
-      <section>
-        <About />
-      </section>
+      <About />
 
-      <section>
-        <Capabilities />
-      </section>
+      <Capabilities />
 
-      <section>
-        <Portfolio />
-      </section>
+      <Portfolio />
 
-      <section>
-        <Pricing />
-      </section>
+      <Pricing />
 
-      <section>
-        <Contact />
-      </section>
+      <Contact />
 
-      {/* Footer */}
-      <footer>
-        <Footer />
-      </footer>
+      <Footer />
     </main>
   )
 }

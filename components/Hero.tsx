@@ -11,17 +11,17 @@ export default function Hero() {
         <div>
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">
             <CheckCircle2 size={16} className="text-cyan-400" />
-            Building production-ready technology for modern businesses
+            Building scalable digital infrastructure from Nigeria for global businesses
           </div>
 
           <h1 className="max-w-4xl text-5xl font-black leading-tight tracking-tight md:text-7xl">
-            Scalable software, SaaS platforms and AI systems for the future.
+            Software, SaaS, AI and POS systems built for serious business growth.
           </h1>
 
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-            SuperILM Technologies builds professional digital products: business
-            websites, cloud software, POS systems, dashboards, AI tools,
-            automation platforms, and enterprise-grade applications.
+            SuperILM Tech builds production-ready platforms for companies that
+            need reliable software, cloud systems, automation, analytics,
+            offline-ready POS infrastructure, and enterprise-grade digital tools.
           </p>
 
           <div className="mt-9 flex flex-col gap-4 sm:flex-row">
@@ -29,7 +29,7 @@ export default function Hero() {
               href="#contact"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-7 py-4 font-bold text-white shadow-glow transition hover:bg-blue-500"
             >
-              Build With Us
+              Start a Project
               <ArrowRight size={18} />
             </a>
 
@@ -52,25 +52,33 @@ export default function Hero() {
 
             <div className="space-y-4">
               <div className="rounded-2xl bg-blue-600/20 p-5">
-                <p className="text-sm text-cyan-300">SuperILM Technologies Cloud Console</p>
-                <h3 className="mt-2 text-2xl font-black">Enterprise Control Center</h3>
+                <p className="text-sm text-cyan-300">
+                  SuperILM Tech Business Systems Console
+                </p>
+                <h3 className="mt-2 text-2xl font-black">
+                  Enterprise Control Center
+                </h3>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 {stats.map((item) => (
                   <div key={item.label} className="rounded-2xl bg-white/5 p-4">
-                    <p className="text-2xl font-black gradient-text">{item.value}</p>
+                    <p className="text-2xl font-black gradient-text">
+                      {item.value}
+                    </p>
                     <p className="mt-2 text-sm text-slate-400">{item.label}</p>
                   </div>
                 ))}
               </div>
 
               <div className="rounded-2xl border border-white/10 p-5">
-                <p className="text-sm text-slate-400">System readiness</p>
+                <p className="text-sm text-slate-400">Deployment readiness</p>
                 <div className="mt-3 h-3 rounded-full bg-white/10">
                   <div className="h-3 w-[92%] rounded-full bg-gradient-to-r from-cyan-400 to-blue-600" />
                 </div>
-                <p className="mt-3 text-sm text-slate-300">92% launch-ready architecture</p>
+                <p className="mt-3 text-sm text-slate-300">
+                  Cloud-ready, scalable, and built for real operations
+                </p>
               </div>
             </div>
           </div>

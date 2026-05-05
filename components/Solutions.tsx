@@ -7,8 +7,8 @@ export default function Solutions() {
       <div className="mx-auto max-w-7xl">
         <SectionHeader
           label="Solutions"
-          title="Technology systems built for real businesses"
-          description="We do not build basic websites only. We build systems that help businesses operate, sell, automate, scale, and compete."
+          title="Systems that solve business problems, not just pages on a screen"
+          description="SuperILM Tech builds practical software infrastructure for companies that need better operations, faster decisions, digital automation, and scalable revenue systems."
         />
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -25,9 +25,16 @@ export default function Solutions() {
                 </div>
 
                 <h3 className="text-xl font-black">{solution.title}</h3>
+
                 <p className="mt-4 leading-7 text-slate-400">
                   {solution.description}
                 </p>
+
+                {"impact" in solution && solution.impact ? (
+                  <p className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-300">
+                    {solution.impact}
+                  </p>
+                ) : null}
               </div>
             )
           })}
