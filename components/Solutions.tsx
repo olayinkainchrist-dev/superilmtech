@@ -29,12 +29,6 @@ export default function Solutions() {
                 <p className="mt-4 leading-7 text-slate-400">
                   {solution.description}
                 </p>
-
-                {solution.impact && (
-                  <p className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-300">
-                    {solution.impact}
-                  </p>
-                )}
               </div>
             )
           })}
