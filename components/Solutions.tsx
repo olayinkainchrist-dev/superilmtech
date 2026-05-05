@@ -30,11 +30,11 @@ export default function Solutions() {
                   {solution.description}
                 </p>
 
-                {"impact" in solution && solution.impact ? (
+                {solution.impact && (
                   <p className="mt-5 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-slate-300">
                     {solution.impact}
                   </p>
-                ) : null}
+                )}
               </div>
             )
           })}
