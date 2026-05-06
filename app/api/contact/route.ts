@@ -1,5 +1,6 @@
 import { Resend } from "resend"
 import { supabase } from "@/lib/supabase"
+import { sendWhatsAppLeadAlert } from "@/lib/sendWhatsApp"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
@@ -50,20 +51,27 @@ function qualifyLead(projectType: string, message: string) {
     tags.push("Dashboard")
   }
 
-  if (text.includes("urgent") || text.includes("asap") || text.includes("immediately")) {
+  if (
+    text.includes("urgent") ||
+    text.includes("asap") ||
+    text.includes("immediately")
+  ) {
     score += 15
     tags.push("Urgent")
   }
 
-  if (text.includes("enterprise") || text.includes("company") || text.includes("business")) {
+  if (
+    text.includes("enterprise") ||
+    text.includes("company") ||
+    text.includes("business")
+  ) {
     score += 15
     tags.push("Business")
   }
 
   score = Math.min(score, 100)
 
-  const priority =
-    score >= 80 ? "high" : score >= 60 ? "medium" : "normal"
+  const priority = score >= 80 ? "high" : score >= 60 ? "medium" : "normal"
 
   const budgetEstimate =
     score >= 80
@@ -94,7 +102,7 @@ function qualifyLead(projectType: string, message: string) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<Response> {
   try {
     if (!process.env.RESEND_API_KEY) {
       return Response.json(
@@ -202,11 +210,23 @@ export async function POST(request: Request) {
       )
     }
 
+    try {
+      await sendWhatsAppLeadAlert({
+        name,
+        email,
+        projectType,
+        priority: ai.priority,
+        budgetEstimate: ai.budgetEstimate,
+      })
+    } catch (whatsAppError) {
+      console.error("WhatsApp alert failed:", whatsAppError)
+    }
+
     return Response.json({
       success: true,
       message: dbError
         ? "Message sent, but lead storage failed."
-        : "Message sent, saved, and qualified successfully.",
+        : "Message sent, saved, qualified, and alert processed successfully.",
     })
   } catch (error) {
     return Response.json(
