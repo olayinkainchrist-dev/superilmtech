@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from "react"
 import {
   Brain,
+  CheckCircle2,
   Lock,
   Mail,
   RefreshCw,
@@ -29,12 +30,22 @@ type Lead = {
   ai_tags?: string[]
 }
 
+const leadStatuses = [
+  "new",
+  "contacted",
+  "qualified",
+  "closed",
+  "archived",
+]
+
 export default function AdminLeadsDashboard() {
   const [password, setPassword] = useState("")
   const [leads, setLeads] = useState<Lead[]>([])
   const [search, setSearch] = useState("")
   const [priorityFilter, setPriorityFilter] = useState("all")
+  const [statusFilter, setStatusFilter] = useState("all")
   const [loading, setLoading] = useState(false)
+  const [updatingLeadId, setUpdatingLeadId] = useState<string | null>(null)
   const [error, setError] = useState("")
   const [unlocked, setUnlocked] = useState(false)
 
@@ -53,6 +64,7 @@ export default function AdminLeadsDashboard() {
           lead.ai_budget_estimate,
           lead.ai_project_summary,
           lead.ai_recommended_next_step,
+          lead.status,
           ...(lead.ai_tags || []),
         ]
           .filter(Boolean)
@@ -61,9 +73,12 @@ export default function AdminLeadsDashboard() {
       const matchesPriority =
         priorityFilter === "all" || lead.ai_priority === priorityFilter
 
-      return matchesSearch && matchesPriority
+      const matchesStatus =
+        statusFilter === "all" || lead.status === statusFilter
+
+      return matchesSearch && matchesPriority && matchesStatus
     })
-  }, [leads, search, priorityFilter])
+  }, [leads, search, priorityFilter, statusFilter])
 
   async function fetchLeads(currentPassword = password) {
     setLoading(true)
@@ -97,11 +112,73 @@ export default function AdminLeadsDashboard() {
     await fetchLeads(password)
   }
 
+  async function updateLeadStatus(id: string, status: string) {
+    setUpdatingLeadId(id)
+
+    try {
+      const response = await fetch("/api/admin/leads", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-password": password,
+        },
+        body: JSON.stringify({
+          id,
+          status,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Could not update status.")
+      }
+
+      setLeads((previous) =>
+        previous.map((lead) =>
+          lead.id === id ? { ...lead, status } : lead
+        )
+      )
+    } catch (err) {
+      alert(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong while updating status."
+      )
+    } finally {
+      setUpdatingLeadId(null)
+    }
+  }
+
   function priorityClass(priority?: string) {
-    if (priority === "high") return "border-red-500/30 bg-red-500/10 text-red-300"
-    if (priority === "medium")
+    if (priority === "high") {
+      return "border-red-500/30 bg-red-500/10 text-red-300"
+    }
+
+    if (priority === "medium") {
       return "border-yellow-500/30 bg-yellow-500/10 text-yellow-300"
+    }
+
     return "border-cyan-500/30 bg-cyan-500/10 text-cyan-300"
+  }
+
+  function statusClass(status?: string) {
+    switch (status) {
+      case "closed":
+        return "border-green-500/30 bg-green-500/10 text-green-300"
+
+      case "qualified":
+        return "border-cyan-500/30 bg-cyan-500/10 text-cyan-300"
+
+      case "contacted":
+        return "border-yellow-500/30 bg-yellow-500/10 text-yellow-300"
+
+      case "archived":
+        return "border-slate-500/30 bg-slate-500/10 text-slate-300"
+
+      default:
+        return "border-blue-500/30 bg-blue-500/10 text-blue-300"
+    }
   }
 
   function exportCSV() {
@@ -109,6 +186,7 @@ export default function AdminLeadsDashboard() {
       name: lead.name,
       email: lead.email,
       service: lead.service,
+      status: lead.status || "",
       priority: lead.ai_priority || "",
       score: lead.ai_score || 0,
       budget: lead.ai_budget_estimate || "",
@@ -119,6 +197,7 @@ export default function AdminLeadsDashboard() {
     }))
 
     const header = Object.keys(rows[0] || {}).join(",")
+
     const body = rows
       .map((row) =>
         Object.values(row)
@@ -128,10 +207,15 @@ export default function AdminLeadsDashboard() {
       .join("\n")
 
     const csv = `${header}\n${body}`
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+
+    const blob = new Blob([csv], {
+      type: "text/csv;charset=utf-8;",
+    })
+
     const url = URL.createObjectURL(blob)
 
     const link = document.createElement("a")
+
     link.href = url
     link.download = "superilm-leads.csv"
     link.click()
@@ -147,12 +231,18 @@ export default function AdminLeadsDashboard() {
             <Lock />
           </div>
 
-          <h1 className="text-3xl font-black">SuperILM Leads Admin</h1>
+          <h1 className="text-3xl font-black">
+            SuperILM Leads Admin
+          </h1>
+
           <p className="mt-3 text-slate-400">
-            Enter your admin password to view AI-qualified project requests.
+            Enter your admin password to manage AI-qualified project leads.
           </p>
 
-          <form onSubmit={handleLogin} className="mt-8 space-y-4">
+          <form
+            onSubmit={handleLogin}
+            className="mt-8 space-y-4"
+          >
             <input
               type="password"
               placeholder="Admin password"
@@ -187,11 +277,15 @@ export default function AdminLeadsDashboard() {
         <div className="mb-8 flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <div>
             <p className="text-sm font-black uppercase tracking-[0.3em] text-cyan-400">
-              AI Lead Dashboard
+              AI Lead CRM
             </p>
-            <h1 className="mt-3 text-4xl font-black">SuperILM Project Leads</h1>
+
+            <h1 className="mt-3 text-4xl font-black">
+              SuperILM Project Leads
+            </h1>
+
             <p className="mt-3 text-slate-400">
-              View, search, qualify, and export website leads.
+              Manage, qualify, track, and close project opportunities.
             </p>
           </div>
 
@@ -209,26 +303,35 @@ export default function AdminLeadsDashboard() {
               disabled={loading}
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3 font-bold transition hover:bg-white/10 disabled:opacity-60"
             >
-              <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
+              <RefreshCw
+                size={18}
+                className={loading ? "animate-spin" : ""}
+              />
               Refresh
             </button>
           </div>
         </div>
 
-        <div className="mb-6 grid gap-4 md:grid-cols-[1fr_220px]">
+        <div className="mb-6 grid gap-4 lg:grid-cols-3">
           <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-4">
-            <Search size={18} className="text-slate-500" />
+            <Search
+              size={18}
+              className="text-slate-500"
+            />
+
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by name, email, service, message, tag..."
+              placeholder="Search leads..."
               className="w-full bg-transparent outline-none placeholder:text-slate-600"
             />
           </div>
 
           <select
             value={priorityFilter}
-            onChange={(event) => setPriorityFilter(event.target.value)}
+            onChange={(event) =>
+              setPriorityFilter(event.target.value)
+            }
             className="rounded-2xl border border-white/10 bg-slate-900 px-5 py-4 outline-none"
           >
             <option value="all">All priorities</option>
@@ -236,19 +339,60 @@ export default function AdminLeadsDashboard() {
             <option value="medium">Medium priority</option>
             <option value="normal">Normal priority</option>
           </select>
+
+          <select
+            value={statusFilter}
+            onChange={(event) =>
+              setStatusFilter(event.target.value)
+            }
+            className="rounded-2xl border border-white/10 bg-slate-900 px-5 py-4 outline-none"
+          >
+            <option value="all">All statuses</option>
+            {leadStatuses.map((status) => (
+              <option
+                key={status}
+                value={status}
+              >
+                {status}
+              </option>
+            ))}
+          </select>
         </div>
 
-        <div className="mb-6 grid gap-4 md:grid-cols-4">
+        <div className="mb-6 grid gap-4 md:grid-cols-5">
           <Stat label="Total leads" value={leads.length} />
+
           <Stat
             label="High priority"
-            value={leads.filter((lead) => lead.ai_priority === "high").length}
+            value={
+              leads.filter(
+                (lead) => lead.ai_priority === "high"
+              ).length
+            }
           />
+
           <Stat
-            label="Medium priority"
-            value={leads.filter((lead) => lead.ai_priority === "medium").length}
+            label="Qualified"
+            value={
+              leads.filter(
+                (lead) => lead.status === "qualified"
+              ).length
+            }
           />
-          <Stat label="Filtered view" value={filteredLeads.length} />
+
+          <Stat
+            label="Closed"
+            value={
+              leads.filter(
+                (lead) => lead.status === "closed"
+              ).length
+            }
+          />
+
+          <Stat
+            label="Filtered"
+            value={filteredLeads.length}
+          />
         </div>
 
         <div className="grid gap-5">
@@ -262,19 +406,51 @@ export default function AdminLeadsDashboard() {
                 key={lead.id}
                 className="rounded-3xl border border-white/10 bg-white/[0.04] p-6"
               >
-                <div className="flex flex-col justify-between gap-4 md:flex-row">
+                <div className="flex flex-col justify-between gap-5 lg:flex-row">
                   <div>
-                    <h2 className="text-xl font-black">{lead.name}</h2>
+                    <h2 className="text-2xl font-black">
+                      {lead.name}
+                    </h2>
+
                     <div className="mt-2 flex items-center gap-2 text-slate-400">
                       <Mail size={16} />
-                      <a href={`mailto:${lead.email}`} className="hover:text-white">
+
+                      <a
+                        href={`mailto:${lead.email}`}
+                        className="hover:text-white"
+                      >
                         {lead.email}
                       </a>
                     </div>
                   </div>
 
-                  <div className="text-sm text-slate-500">
-                    {new Date(lead.created_at).toLocaleString()}
+                  <div className="flex flex-col gap-3 lg:items-end">
+                    <div className="text-sm text-slate-500">
+                      {new Date(
+                        lead.created_at
+                      ).toLocaleString()}
+                    </div>
+
+                    <select
+                      value={lead.status || "new"}
+                      disabled={updatingLeadId === lead.id}
+                      onChange={(event) =>
+                        updateLeadStatus(
+                          lead.id,
+                          event.target.value
+                        )
+                      }
+                      className="rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm font-bold outline-none"
+                    >
+                      {leadStatuses.map((status) => (
+                        <option
+                          key={status}
+                          value={status}
+                        >
+                          {status}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
@@ -290,6 +466,15 @@ export default function AdminLeadsDashboard() {
                     {lead.ai_priority || "normal"} priority
                   </span>
 
+                  <span
+                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold ${statusClass(
+                      lead.status
+                    )}`}
+                  >
+                    <CheckCircle2 size={15} />
+                    {lead.status || "new"}
+                  </span>
+
                   <Badge>
                     <Brain size={15} />
                     Score {lead.ai_score || 0}/100
@@ -300,13 +485,19 @@ export default function AdminLeadsDashboard() {
                   <InfoBox
                     icon={<Wallet size={18} />}
                     label="AI Budget Estimate"
-                    value={lead.ai_budget_estimate || "Not estimated"}
+                    value={
+                      lead.ai_budget_estimate ||
+                      "Not estimated"
+                    }
                   />
 
                   <InfoBox
                     icon={<Brain size={18} />}
                     label="Recommended Next Step"
-                    value={lead.ai_recommended_next_step || "Follow up manually."}
+                    value={
+                      lead.ai_recommended_next_step ||
+                      "Follow up manually."
+                    }
                   />
                 </div>
 
@@ -315,25 +506,27 @@ export default function AdminLeadsDashboard() {
                     <p className="text-sm font-bold text-cyan-300">
                       AI Project Summary
                     </p>
+
                     <p className="mt-3 leading-7 text-slate-300">
                       {lead.ai_project_summary}
                     </p>
                   </div>
                 )}
 
-                {lead.ai_tags && lead.ai_tags.length > 0 && (
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {lead.ai_tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-xs font-bold text-slate-300"
-                      >
-                        <Tag size={13} />
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                {lead.ai_tags &&
+                  lead.ai_tags.length > 0 && (
+                    <div className="mt-5 flex flex-wrap gap-2">
+                      {lead.ai_tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-xs font-bold text-slate-300"
+                        >
+                          <Tag size={13} />
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                 <p className="mt-5 whitespace-pre-wrap leading-7 text-slate-300">
                   {lead.message}
@@ -347,16 +540,31 @@ export default function AdminLeadsDashboard() {
   )
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({
+  label,
+  value,
+}: {
+  label: string
+  value: number
+}) {
   return (
     <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
-      <p className="text-3xl font-black text-white">{value}</p>
-      <p className="mt-2 text-sm text-slate-400">{label}</p>
+      <p className="text-3xl font-black text-white">
+        {value}
+      </p>
+
+      <p className="mt-2 text-sm text-slate-400">
+        {label}
+      </p>
     </div>
   )
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
+function Badge({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <span className="inline-flex items-center gap-2 rounded-full bg-blue-600/20 px-4 py-2 text-sm font-bold text-cyan-300">
       {children}
@@ -377,9 +585,15 @@ function InfoBox({
     <div className="rounded-2xl border border-white/10 bg-slate-950/70 p-5">
       <div className="flex items-center gap-2 text-cyan-300">
         {icon}
-        <p className="text-sm font-bold">{label}</p>
+
+        <p className="text-sm font-bold">
+          {label}
+        </p>
       </div>
-      <p className="mt-3 leading-7 text-slate-300">{value}</p>
+
+      <p className="mt-3 leading-7 text-slate-300">
+        {value}
+      </p>
     </div>
   )
 }
