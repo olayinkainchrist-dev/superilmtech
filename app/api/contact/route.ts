@@ -24,6 +24,76 @@ function escapeHtml(value: string) {
     .replaceAll("'", "&#039;")
 }
 
+function qualifyLead(projectType: string, message: string) {
+  const text = `${projectType} ${message}`.toLowerCase()
+
+  let score = 40
+  const tags: string[] = []
+
+  if (text.includes("pos")) {
+    score += 20
+    tags.push("POS")
+  }
+
+  if (text.includes("saas")) {
+    score += 25
+    tags.push("SaaS")
+  }
+
+  if (text.includes("ai") || text.includes("automation")) {
+    score += 20
+    tags.push("AI")
+  }
+
+  if (text.includes("dashboard") || text.includes("analytics")) {
+    score += 15
+    tags.push("Dashboard")
+  }
+
+  if (text.includes("urgent") || text.includes("asap") || text.includes("immediately")) {
+    score += 15
+    tags.push("Urgent")
+  }
+
+  if (text.includes("enterprise") || text.includes("company") || text.includes("business")) {
+    score += 15
+    tags.push("Business")
+  }
+
+  score = Math.min(score, 100)
+
+  const priority =
+    score >= 80 ? "high" : score >= 60 ? "medium" : "normal"
+
+  const budgetEstimate =
+    score >= 80
+      ? "₦1,500,000+ / enterprise-level project"
+      : score >= 60
+        ? "₦500,000 - ₦1,500,000 / serious business build"
+        : "₦150,000 - ₦500,000 / starter project"
+
+  const summary = `Potential ${projectType} project. Client needs help with: ${message.slice(
+    0,
+    220
+  )}${message.length > 220 ? "..." : ""}`
+
+  const nextStep =
+    priority === "high"
+      ? "Schedule a discovery call and prepare a formal proposal."
+      : priority === "medium"
+        ? "Reply with clarifying questions and offer a consultation."
+        : "Send a friendly response and qualify budget/timeline."
+
+  return {
+    score,
+    priority,
+    budgetEstimate,
+    summary,
+    nextStep,
+    tags,
+  }
+}
+
 export async function POST(request: Request) {
   try {
     if (!process.env.RESEND_API_KEY) {
@@ -32,20 +102,6 @@ export async function POST(request: Request) {
           success: false,
           error:
             "RESEND_API_KEY is missing. Add it to .env.local and restart server.",
-        },
-        { status: 500 }
-      )
-    }
-
-    if (
-      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    ) {
-      return Response.json(
-        {
-          success: false,
-          error:
-            "Supabase environment variables are missing. Add them to .env.local and restart server.",
         },
         { status: 500 }
       )
@@ -77,9 +133,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const toEmail = process.env.CONTACT_TO_EMAIL || "admin@superilmtech.com"
-    const fromEmail =
-      process.env.CONTACT_FROM_EMAIL || "SuperILM Tech <hello@superilmtech.com>"
+    const ai = qualifyLead(projectType, message)
 
     const { error: dbError } = await supabase.from("leads").insert([
       {
@@ -87,12 +141,24 @@ export async function POST(request: Request) {
         email,
         service: projectType,
         message,
+        status: "new",
+        source: "website",
+        ai_score: ai.score,
+        ai_priority: ai.priority,
+        ai_budget_estimate: ai.budgetEstimate,
+        ai_project_summary: ai.summary,
+        ai_recommended_next_step: ai.nextStep,
+        ai_tags: ai.tags,
       },
     ])
 
     if (dbError) {
       console.error("Supabase lead insert error:", dbError)
     }
+
+    const toEmail = process.env.CONTACT_TO_EMAIL || "superilmtech@gmail.com"
+    const fromEmail =
+      process.env.CONTACT_FROM_EMAIL || "SuperILM Tech <onboarding@resend.dev>"
 
     const safeName = escapeHtml(name)
     const safeEmail = escapeHtml(email)
@@ -103,14 +169,26 @@ export async function POST(request: Request) {
       from: fromEmail,
       to: [toEmail],
       replyTo: email,
-      subject: `New SuperILM Tech Project Request - ${projectType}`,
+      subject: `New SuperILM Tech Lead - ${ai.priority.toUpperCase()} Priority`,
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
           <h2>New Project Request</h2>
+
           <p><strong>Name:</strong> ${safeName}</p>
           <p><strong>Email:</strong> ${safeEmail}</p>
           <p><strong>Project Type:</strong> ${safeProjectType}</p>
+
           <hr />
+
+          <h3>AI Lead Qualification</h3>
+          <p><strong>Score:</strong> ${ai.score}/100</p>
+          <p><strong>Priority:</strong> ${ai.priority}</p>
+          <p><strong>Budget Estimate:</strong> ${ai.budgetEstimate}</p>
+          <p><strong>Recommended Next Step:</strong> ${ai.nextStep}</p>
+          <p><strong>Tags:</strong> ${ai.tags.join(", ") || "General"}</p>
+
+          <hr />
+
           <p><strong>Message:</strong></p>
           <p>${safeMessage}</p>
         </div>
@@ -127,8 +205,8 @@ export async function POST(request: Request) {
     return Response.json({
       success: true,
       message: dbError
-        ? "Message sent successfully, but lead storage failed."
-        : "Message sent and saved successfully.",
+        ? "Message sent, but lead storage failed."
+        : "Message sent, saved, and qualified successfully.",
     })
   } catch (error) {
     return Response.json(
