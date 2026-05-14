@@ -1,4 +1,7 @@
-import { ExternalLink, PlayCircle, ShoppingCart } from "lucide-react"
+"use client"
+
+import Link from "next/link"
+import { ArrowUpRight } from "lucide-react"
 import { portfolio } from "@/data/site"
 import SectionHeader from "./SectionHeader"
 
@@ -9,97 +12,101 @@ export default function Portfolio() {
         <SectionHeader
           label="Portfolio"
           title="Built like real products, not simple demos"
-          description="Our project direction focuses on production systems, business value, scalability, and professional deployment."
+          description="Production-grade systems focused on scalability, business value, automation, and modern deployment infrastructure."
         />
 
         <div className="grid gap-8 lg:grid-cols-3">
           {portfolio.map((project) => (
-            <article
+            <div
               key={project.title}
-              className="glass group overflow-hidden rounded-3xl p-7 transition hover:-translate-y-2 hover:border-cyan-400/40"
+              className="glass group overflow-hidden rounded-3xl border border-white/10 bg-slate-950/40 transition duration-300 hover:-translate-y-2 hover:border-cyan-400/40"
             >
-              <div className="relative mb-6 overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-blue-600/40 via-cyan-500/20 to-yellow-400/20 p-3">
+              {/* VIDEO / PREVIEW */}
+              <div className="relative overflow-hidden border-b border-white/10">
                 {project.video ? (
-                  <div className="relative aspect-video overflow-hidden rounded-xl bg-slate-950">
-                    <video
-                      className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                      src={project.video}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      preload="metadata"
-                    />
-
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-
-                    <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-xs font-bold text-cyan-300 backdrop-blur">
-                      <PlayCircle size={14} />
-                      Live product demo
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="h-64 w-full object-cover"
+                  >
+                    <source src={project.video} type="video/mp4" />
+                  </video>
+                ) : (
+                  <div className="flex h-64 items-center justify-center bg-gradient-to-br from-blue-600/40 via-cyan-500/20 to-yellow-400/20">
+                    <div className="h-40 w-4/5 rounded-2xl border border-white/10 bg-slate-950/70 p-5">
+                      <div className="mb-4 h-3 w-24 rounded-full bg-white/20" />
+                      <div className="mb-3 h-3 w-full rounded-full bg-white/10" />
+                      <div className="mb-3 h-3 w-4/5 rounded-full bg-white/10" />
+                      <div className="mt-8 h-12 rounded-xl bg-blue-600/30" />
                     </div>
                   </div>
-                ) : (
-                  <div className="h-44 rounded-xl border border-white/10 bg-slate-950/60 p-4">
-                    <div className="mb-4 h-3 w-24 rounded-full bg-white/20" />
-                    <div className="mb-3 h-3 w-full rounded-full bg-white/10" />
-                    <div className="mb-3 h-3 w-4/5 rounded-full bg-white/10" />
-                    <div className="mt-8 h-12 rounded-xl bg-blue-600/30" />
+                )}
+
+                {project.productUrl && (
+                  <Link
+                    href={project.productUrl}
+                    target="_blank"
+                    className="absolute right-4 top-4 flex items-center gap-2 rounded-full border border-white/10 bg-black/70 px-4 py-2 text-sm font-bold text-white backdrop-blur-md transition hover:bg-cyan-500"
+                  >
+                    View Product
+                    <ArrowUpRight size={16} />
+                  </Link>
+                )}
+              </div>
+
+              {/* CONTENT */}
+              <div className="p-7">
+                <h3 className="text-2xl font-black tracking-tight text-white">
+                  {project.title}
+                </h3>
+
+                <p className="mt-4 leading-8 text-slate-400">
+                  {project.description}
+                </p>
+
+                {/* TAGS */}
+                <div className="mt-6 flex flex-wrap gap-2">
+                  {project.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-slate-300"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+
+                {/* METRICS */}
+                {project.metrics && (
+                  <div className="mt-6 space-y-3">
+                    {project.metrics.map((metric) => (
+                      <div
+                        key={metric}
+                        className="rounded-2xl border border-cyan-500/10 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-200"
+                      >
+                        {metric}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* CTA */}
+                {project.productUrl && (
+                  <div className="mt-8">
+                    <Link
+                      href={project.productUrl}
+                      target="_blank"
+                      className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 font-black text-white transition hover:bg-blue-500"
+                    >
+                      Buy / View Product
+                      <ArrowUpRight size={18} />
+                    </Link>
                   </div>
                 )}
               </div>
-
-              <div className="flex items-start justify-between gap-4">
-                <h3 className="text-xl font-black">{project.title}</h3>
-
-                {project.productUrl && (
-                  <a
-                    href={project.productUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`Open ${project.title}`}
-                    className="rounded-full border border-white/10 p-2 text-slate-400 transition hover:border-cyan-400/40 hover:text-cyan-300"
-                  >
-                    <ExternalLink size={18} />
-                  </a>
-                )}
-              </div>
-
-              <p className="mt-4 leading-7 text-slate-400">
-                {project.description}
-              </p>
-
-              <div className="mt-6 flex flex-wrap gap-2">
-                {project.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full bg-white/5 px-3 py-1 text-sm text-slate-300"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              {project.productUrl && (
-                <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                  <a
-                    href={project.productUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-black text-white shadow-glow transition hover:bg-blue-500"
-                  >
-                    <ShoppingCart size={16} />
-                    Buy on Gumroad
-                  </a>
-
-                  <a
-                    href="#contact"
-                    className="inline-flex items-center justify-center rounded-full border border-white/10 px-5 py-3 text-sm font-black text-white transition hover:bg-white/10"
-                  >
-                    Request Custom Version
-                  </a>
-                </div>
-              )}
-            </article>
+            </div>
           ))}
         </div>
       </div>
