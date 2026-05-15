@@ -173,7 +173,7 @@ export const portfolio = [
   {
     title: "Customer Churn Prediction Platform",
     description:
-      "An AI-powered machine learning platform that predicts customer churn using behavioral analytics, demographic insights, transaction history, and predictive modeling.",
+      "A production-ready machine learning dashboard that predicts customer churn using customer behavior, transaction activity, demographics, engagement signals, and predictive analytics.",
     tags: [
       "Python",
       "Scikit-learn",
@@ -183,13 +183,14 @@ export const portfolio = [
       "AI",
     ],
     video: "/videos/customer-churn-prediction-demo.mp4",
-    liveUrl: "",
-    githubUrl: "https://github.com/olayinkainchrist-dev/customer-churn-prediction",
     productUrl: "",
+    liveUrl: "",
+    githubUrl:
+      "https://github.com/olayinkainchrist-dev/customer-churn-prediction",
     metrics: [
-      "AI-powered predictions",
-      "Customer retention intelligence",
-      "Predictive analytics dashboard",
+      "AI-powered churn risk prediction",
+      "Interactive business intelligence dashboard",
+      "Customer retention decision support",
     ],
   },
   {
@@ -198,9 +199,9 @@ export const portfolio = [
       "Modern dashboards that convert raw business data into useful KPIs, trends, and executive decisions.",
     tags: ["React", "Charts", "SQL", "Analytics", "Cloud"],
     video: "",
+    productUrl: "",
     liveUrl: "",
     githubUrl: "",
-    productUrl: "",
     metrics: [
       "Executive reporting",
       "Live KPI dashboards",
