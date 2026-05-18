@@ -182,7 +182,7 @@ export const portfolio = [
       "Analytics",
       "AI",
     ],
-    video: "/videos/customer-churn-prediction-demo.mp4",
+    video: "/videos/churn-demo.mp4",
     productUrl: "",
     liveUrl: "",
     githubUrl:
@@ -279,7 +279,7 @@ export const company = {
   name: "SuperILM Tech",
   legalName: "SuperILM Technologies",
   tagline: "Software • SaaS • AI",
-  email: "admin@superilmtech.com",
+  email: "superilmtech@gmail.com",
   phone: "+2348052480026",
   location: "Lagos, Nigeria — serving global clients",
   website: "https://superilmtech.com",
