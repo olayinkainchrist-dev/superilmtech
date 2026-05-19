@@ -5,6 +5,7 @@ import { portfolio } from "@/data/site"
 import {
   ArrowUpRight,
   Code2,
+  CreditCard,
   PlayCircle,
   ShoppingCart,
   Sparkles,
@@ -22,6 +23,8 @@ type PortfolioProject = {
   tags: string[]
   video?: string
   productUrl?: string
+  payhipUrl?: string
+  lemonSqueezyUrl?: string
   liveUrl?: string
   githubUrl?: string
   metrics?: string[]
@@ -50,12 +53,10 @@ export default function PortfolioPage() {
 
           <div className="mt-14 grid gap-8 lg:grid-cols-3">
             {(portfolio as PortfolioProject[]).map((project) => {
-              const hasProductUrl = Boolean(project.productUrl)
-              const hasLiveUrl = Boolean(project.liveUrl)
-              const hasGithubUrl = Boolean(project.githubUrl)
-
               const primaryUrl =
                 project.productUrl ||
+                project.payhipUrl ||
+                project.lemonSqueezyUrl ||
                 project.liveUrl ||
                 project.githubUrl
 
@@ -64,7 +65,6 @@ export default function PortfolioPage() {
                   key={project.title}
                   className="glass group overflow-hidden rounded-3xl border border-white/10 transition duration-300 hover:-translate-y-2 hover:border-cyan-400/40"
                 >
-                  {/* VIDEO */}
                   <div className="relative overflow-hidden border-b border-white/10 bg-slate-950">
                     {project.video ? (
                       <div className="relative aspect-video">
@@ -77,9 +77,7 @@ export default function PortfolioPage() {
                           preload="metadata"
                           className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                         />
-
                         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-
                         <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3 py-2 text-xs font-black text-cyan-300 backdrop-blur">
                           <PlayCircle size={14} />
                           Live demo
@@ -97,19 +95,15 @@ export default function PortfolioPage() {
                     )}
                   </div>
 
-                  {/* CONTENT */}
                   <div className="p-7">
                     <div className="flex items-start justify-between gap-4">
-                      <h2 className="text-xl font-black">
-                        {project.title}
-                      </h2>
+                      <h2 className="text-xl font-black">{project.title}</h2>
 
                       {primaryUrl && (
                         <a
                           href={primaryUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          aria-label={`Open ${project.title}`}
                           className="rounded-full border border-white/10 p-2 text-slate-400 transition hover:border-cyan-400/40 hover:text-cyan-300"
                         >
                           <ArrowUpRight size={18} />
@@ -121,7 +115,6 @@ export default function PortfolioPage() {
                       {project.description}
                     </p>
 
-                    {/* TAGS */}
                     <div className="mt-6 flex flex-wrap gap-2">
                       {project.tags.map((tag) => (
                         <span
@@ -133,7 +126,6 @@ export default function PortfolioPage() {
                       ))}
                     </div>
 
-                    {/* METRICS */}
                     {project.metrics && (
                       <div className="mt-6 space-y-3">
                         {project.metrics.map((metric) => (
@@ -148,12 +140,9 @@ export default function PortfolioPage() {
                       </div>
                     )}
 
-                    {/* ACTION BUTTONS */}
-                    {(hasProductUrl ||
-                      hasLiveUrl ||
-                      hasGithubUrl) && (
+                    {primaryUrl && (
                       <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                        {hasProductUrl && (
+                        {project.productUrl && (
                           <a
                             href={project.productUrl}
                             target="_blank"
@@ -165,7 +154,31 @@ export default function PortfolioPage() {
                           </a>
                         )}
 
-                        {hasLiveUrl && (
+                        {project.payhipUrl && (
+                          <a
+                            href={project.payhipUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 rounded-full border border-pink-400/30 bg-pink-400/10 px-5 py-3 text-sm font-black text-pink-200 transition hover:bg-pink-400/20"
+                          >
+                            <CreditCard size={16} />
+                            Buy on Payhip
+                          </a>
+                        )}
+
+                        {project.lemonSqueezyUrl && (
+                          <a
+                            href={project.lemonSqueezyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-5 py-3 text-sm font-black text-emerald-200 transition hover:bg-emerald-400/20"
+                          >
+                            <CreditCard size={16} />
+                            Buy on Lemon Squeezy
+                          </a>
+                        )}
+
+                        {project.liveUrl && (
                           <a
                             href={project.liveUrl}
                             target="_blank"
@@ -177,7 +190,7 @@ export default function PortfolioPage() {
                           </a>
                         )}
 
-                        {hasGithubUrl && (
+                        {project.githubUrl && (
                           <a
                             href={project.githubUrl}
                             target="_blank"

@@ -4,6 +4,7 @@ import Link from "next/link"
 import {
   ArrowUpRight,
   Code2,
+  CreditCard,
   PlayCircle,
   ShoppingCart,
   Sparkles,
@@ -17,6 +18,8 @@ type PortfolioProject = {
   tags: string[]
   video?: string
   productUrl?: string
+  payhipUrl?: string
+  lemonSqueezyUrl?: string
   liveUrl?: string
   githubUrl?: string
   metrics?: string[]
@@ -34,11 +37,12 @@ export default function Portfolio() {
 
         <div className="grid gap-8 lg:grid-cols-3">
           {(portfolio as PortfolioProject[]).map((project) => {
-            const hasProductUrl = Boolean(project.productUrl)
-            const hasLiveUrl = Boolean(project.liveUrl)
-            const hasGithubUrl = Boolean(project.githubUrl)
             const primaryUrl =
-              project.productUrl || project.liveUrl || project.githubUrl
+              project.productUrl ||
+              project.payhipUrl ||
+              project.lemonSqueezyUrl ||
+              project.liveUrl ||
+              project.githubUrl
 
             return (
               <article
@@ -57,9 +61,7 @@ export default function Portfolio() {
                         preload="metadata"
                         className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                       />
-
                       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-
                       <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/60 px-3 py-2 text-xs font-black text-cyan-300 backdrop-blur">
                         <PlayCircle size={14} />
                         Live demo
@@ -123,11 +125,11 @@ export default function Portfolio() {
                     </div>
                   )}
 
-                  {(hasProductUrl || hasLiveUrl || hasGithubUrl) && (
+                  {primaryUrl && (
                     <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                      {hasProductUrl && (
+                      {project.productUrl && (
                         <Link
-                          href={project.productUrl || "#"}
+                          href={project.productUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-black text-white shadow-glow transition hover:bg-blue-500"
@@ -137,9 +139,33 @@ export default function Portfolio() {
                         </Link>
                       )}
 
-                      {hasLiveUrl && (
+                      {project.payhipUrl && (
                         <Link
-                          href={project.liveUrl || "#"}
+                          href={project.payhipUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 rounded-full border border-pink-400/30 bg-pink-400/10 px-5 py-3 text-sm font-black text-pink-200 transition hover:bg-pink-400/20"
+                        >
+                          <CreditCard size={16} />
+                          Buy on Payhip
+                        </Link>
+                      )}
+
+                      {project.lemonSqueezyUrl && (
+                        <Link
+                          href={project.lemonSqueezyUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-5 py-3 text-sm font-black text-emerald-200 transition hover:bg-emerald-400/20"
+                        >
+                          <CreditCard size={16} />
+                          Buy on Lemon Squeezy
+                        </Link>
+                      )}
+
+                      {project.liveUrl && (
+                        <Link
+                          href={project.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center justify-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-5 py-3 text-sm font-black text-cyan-200 transition hover:bg-cyan-400/20"
@@ -149,9 +175,9 @@ export default function Portfolio() {
                         </Link>
                       )}
 
-                      {hasGithubUrl && (
+                      {project.githubUrl && (
                         <Link
-                          href={project.githubUrl || "#"}
+                          href={project.githubUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-black text-white transition hover:bg-white/10"
