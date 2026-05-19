@@ -162,6 +162,9 @@ export const portfolio = [
     ],
     video: "/videos/superilm-pos-demo.mp4",
     productUrl: "https://superilm.gumroad.com/l/superilm-pos",
+    payhipUrl: "https://payhip.com/b/nCEIa",
+    lemonSqueezyUrl:
+      "https://superilmtech.lemonsqueezy.com/checkout/buy/5da89a04-27db-4d8e-9f4b-7f6a0941a279",
     liveUrl: "",
     githubUrl: "",
     metrics: [
@@ -184,6 +187,8 @@ export const portfolio = [
     ],
     video: "/videos/churn-demo.mp4",
     productUrl: "",
+    payhipUrl: "",
+    lemonSqueezyUrl: "",
     liveUrl: "",
     githubUrl:
       "https://github.com/olayinkainchrist-dev/customer-churn-prediction",
@@ -200,6 +205,8 @@ export const portfolio = [
     tags: ["React", "Charts", "SQL", "Analytics", "Cloud"],
     video: "",
     productUrl: "",
+    payhipUrl: "",
+    lemonSqueezyUrl: "",
     liveUrl: "",
     githubUrl: "",
     metrics: [
